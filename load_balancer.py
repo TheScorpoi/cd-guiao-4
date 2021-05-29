@@ -5,6 +5,7 @@ import selectors
 import signal
 import logging
 import argparse
+import time
 
 # configure logger output format
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',datefmt='%m-%d %H:%M:%S')
@@ -82,9 +83,19 @@ class LeastResponseTime:
 
     def update(self, *arg):
         if arg['action' == 'ADD']:
-            print('')
+            self.times[(arg['server'], arg['client'])] = time.time()
+        else:
+            self.times[(arg['server'], arg['client'])] == time.time() - self.times[(arg['server'], arg['client'])]
+            dic_tmp = {}
+            for key, value in self.times.items():
+                if key[0] not in dic_tmp:
+                    dic_tmp[key[0]] = [value]
+                else:
+                    dic_tmp[key[0]].append(self.times[key])
             
-
+            for key, value in dic_tmp.items():
+                total_time = sum(dic_tmp[key])
+                self.answer_times[key] = total_time / len(value)
 
 POLICIES = {
     "N2One": N2One,
