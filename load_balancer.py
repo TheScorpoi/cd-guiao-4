@@ -43,9 +43,12 @@ class N2One:
 class RoundRobin:
     def __init__(self, servers):
         self.servers = servers
+        self.next_server = -1
 
     def select_server(self):
-        pass
+        #comment de logger?
+        self.next_server += 1
+        return self.servers[self.next_server % len(self.servers)]
     
     def update(self, *arg):
         pass
@@ -55,24 +58,32 @@ class RoundRobin:
 class LeastConnections:
     def __init__(self, servers):
         self.servers = servers
+        self.active_connections = {server : 0 for server in servers}
 
     def select_server(self):
-        pass
+        return min(self.active_connections, key = self.active_connections.get)
 
     def update(self, *arg):
-        pass
+        if arg['action'] == 'ADD':
+            self.active_connections[arg['server']] += 1
+        else:
+            self.active_connections[arg['server']] -= 1
 
 
 # least response time
 class LeastResponseTime:
     def __init__(self, servers):
         self.servers = servers
-
+        self.answer_times = {server : 0 for server in servers}
+        self.times = {}
+        
     def select_server(self):
-        pass
+        return min(self.answer_times, key = self.answer_times.get)
 
     def update(self, *arg):
-        pass
+        if arg['action' == 'ADD']:
+            print('')
+            
 
 
 POLICIES = {
