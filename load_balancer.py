@@ -82,7 +82,7 @@ class LeastResponseTime:
         return min(self.answer_times, key = self.answer_times.get)
 
     def update(self, *arg):
-        if arg['action' == 'ADD']:
+        if arg['action'] == 'ADD':
             self.times[(arg['server'], arg['client'])] = time.time()
         else:
             self.times[(arg['server'], arg['client'])] == time.time() - self.times[(arg['server'], arg['client'])]
@@ -97,11 +97,29 @@ class LeastResponseTime:
                 total_time = sum(dic_tmp[key])
                 self.answer_times[key] = total_time / len(value)
 
+class Cache:
+    def __init__(self):
+        self.cacheDic = {} # {idx: {key : value}, ...}
+        self.idx = 0
+        
+    def verify_cache(self, key):
+        for k, v in self.cacheDic.items():
+            if key in v:
+                return v[key]
+            else:
+                return None
+    
+    def add_to_Cache(self, key, value):
+        idx_tmp = self.idx % 5
+        self.cacheDic[idx_tmp] = {key : value}
+        self.idx += 1
+            
+            
 POLICIES = {
-    "N2One": N2One,
-    "RoundRobin": RoundRobin,
-    "LeastConnections": LeastConnections,
-    "LeastResponseTime": LeastResponseTime
+"N2One": N2One,
+"RoundRobin": RoundRobin,
+"LeastConnections": LeastConnections,
+"LeastResponseTime": LeastResponseTime
 }
 
 class SocketMapper:
@@ -151,7 +169,6 @@ def read(conn,mask):
         mapper.delete(conn)
     else:
         mapper.get_sock(conn).send(data)
-
 
 def main(addr, servers, policy_class):
     global policy
